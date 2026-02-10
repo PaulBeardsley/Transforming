@@ -1,0 +1,412 @@
+https://www.anaconda.com/download
+
+
+
+#Best to create and save the python file in the same folder as csv datasets before you start.
+
+#Slide 4
+#Import the libraries you need
+
+import pandas as pd
+import numpy as np
+
+my_named_variable = 99
+
+print(my_named_variable)
+
+#Slide 5
+#ceate a dataset using panda.DataFrame() function
+
+
+data = {
+    'Name': ['Alice', 'Bob Gunner', '     Charlie', np.nan, '          Eve', 'Frank', 'Grace', 'Alice'],
+    'Age': [25, np.nan, 35, 40, 50, 'Unknown', 30, 25],
+    'Gender': ['Female', 'Male', np.nan, 'Female', 'Other', 'Male', 'Female', 'Female'],
+    'Salary': [50000, 52000, 55000, np.nan, 48000, 'N/A', 51000, 50000],
+    'Email': ['alice@email.com', 'bob@email', 'charlie--email.com', '', 'eve@email.com', '', 'grace@email.com', 'alice@email.com'],
+    'Retired':[False,True,False,False,False,False,False,False]
+}
+
+df = pd.DataFrame(data)
+print(df)
+
+
+
+#Slide 6
+
+#Read from a CSV file 
+#Saved in the same root as the python file
+
+df_csv = pd.read_csv("Seattle_cycles_station.csv",sep=',')
+
+#Slide 8/9 
+#View the top and last rows
+
+df_csv.head(5)
+
+df_csv.tail(8)
+
+Slide 11
+#Get a list of the column headings
+
+print(df_csv.columns)
+
+#Get a list of the data types (not the same as SQL)
+
+print(df_csv.dtypes)
+
+#Slide 13
+
+# rows x columns(Shows size of dataset)
+
+print(df_csv.size)
+
+#No of Rows
+
+df_csv.shape[0]
+
+#No of Columns
+
+df_csv.shape[1]
+
+#Slide 15
+
+#Replacing the N/A values with a set value
+
+df_filled = df.fillna({'Name': 'Unknown', 'Gender': 'Unknown'})
+print(df_filled)
+
+#replace NaN with set values
+
+df.replace({'Age': 'Unknown', 'Salary': 'N/A'}, np.nan, inplace=True)
+print(df)
+
+#Slide 16
+
+#Replacing age and salary with a calculated replacement (the sting values need to become float/int)
+
+age_median = df['Age'].median(skipna=True)
+salary_mean = df['Salary'].mean(skipna=True)
+df['Age'].fillna(age_median, inplace=True)
+df['Salary'].fillna(salary_mean, inplace=True)
+print(df)
+
+#Slide 18
+
+#Change the data types of the numeric fields 
+df['Age'] = df['Age'].astype(int)
+df['Salary'] = df['Salary'].astype(float)
+print(df)
+
+#Slide 19
+
+#Working with dates - Into a new small data frame
+
+date_example_df = pd.DataFrame({
+    'Name': ['Alice', 'Bob Newhart'],
+    'DOB_String': ['2021-08-10 15:30:45','2021-08-10 15:30:45']
+})
+date_example_df['DOB_DateTime'] = pd.to_datetime(date_example_df['DOB_String'])
+
+print(date_example_df)
+
+# Example: '2021-08-10 15:30:45'
+date_example_df['Year'] = date_example_df['DOB_DateTime'].dt.year
+date_example_df['Month'] = date_example_df['DOB_DateTime'].dt.month
+date_example_df['day'] = date_example_df['DOB_DateTime'].dt.day
+print(date_example_df)
+
+
+date_example_df['hour'] = date_example_df['DOB_DateTime'].dt.hour
+date_example_df['minute'] = date_example_df['DOB_DateTime'].dt.minute
+date_example_df['second'] = date_example_df['DOB_DateTime'].dt.second
+print(date_example_df)
+
+#Slide 21
+
+#Normalise the numeric columns (use round())
+#We normalize values to bring them into a common scale, making it easier to compare and analyze data. 
+#Normalization also helps to reduce the 
+#impact of outliers and improve the accuracy and stability of statistical models.
+
+df['Salary_Normalized'] = round((df['Salary'] - df['Salary'].min()) / (df['Salary'].max() - df['Salary'].min()),2)
+df['Age_Normalized'] = round((df['Age'] - df['Age'].min()) / (df['Age'].max() - df['Age'].min()),2)
+print(df)
+
+#Slide 22
+
+#Binning of numeric values to group
+
+bins = [0, 30, 40, 50, 60]
+labels = ['20s', '30s', '40s', '50s']
+df['Age Group'] = pd.cut(df['Age'], bins=bins, labels=labels, right=False)
+print(df)
+
+Slide 23
+
+#Categorise the gender column (note the extra columns with boolean results)
+#The get_dummies function is used to convert categorical variables into dummy or indicator variables.
+
+gender_encoded = pd.get_dummies(df['Gender'], prefix='Gender')
+df = pd.concat([df, gender_encoded], axis=1)
+print(df)
+
+#Slide 25
+
+#create a function to validate email address (@) and replace if needed
+
+def is_valid_email(Email):
+    if '@' in Email:
+        return Email
+    else:
+        return np.nan
+    
+df['Email'] = df['Email'].apply(is_valid_email)
+print(df['Email'])
+
+
+
+
+
+
+#Slide 26
+
+# Show the lengths of two text fields (before and after strip)-- Notice Bob Gunner has Len 10 before strip
+
+df['emailname'] = df['Email'].str.split('@').str[0]
+df['domain'] = df['Email'].str.split('@').str[1]
+
+df['Name'] = df['Name'].str.strip()
+df['Length_NameAfterStrip'] = df['Name'].str.len()
+print(df)
+
+
+#Slide 27
+
+# Show the lengths of two text fields (before and after strip)-- Notice Bob Gunner has Len 10 before strip
+
+df['Length_Email'] = df['Email'].str.len()
+df['Length_Name'] = df['Name'].str.len()
+print(df)
+
+#Slide 29
+
+#Using the title, upper and lower function to format the strings
+
+df['NameTitle'] = df['Name'].str.title()  
+print(df['NameTitle'])
+
+
+df['NameUpper'] = df['Name'].str.upper()  
+print(df['NameUpper'])
+
+df['NameLower'] = df['Name'].str.lower()  
+print(df['NameLower'])
+
+
+#Slide 31
+
+
+#Dropping a Column
+
+
+df.drop(["NameUpper","NameTitle"], axis = 1,inplace = True)
+df.reset_index(drop=True)
+
+print(df)
+
+#Dropping duplicate rows
+
+df.drop_duplicates(keep='first', inplace=True)
+print(df)
+
+#Slide 33
+
+#Summarisation
+
+print(df.groupby('Gender').agg({'Age': ['mean', 'median','std','var','sum','first','last','min','max']}))
+print(df.groupby('Gender').agg({'Age': ['count', 'mean', 'nunique','unique']}))
+
+#Slide 34 
+
+#Describe
+
+df.describe()
+
+#Slide 36
+
+#Moving columns to rows (unpivot in PBI)
+
+df_melted = pd.melt(df, id_vars=['Name'], value_vars=['Age', 'Salary'])
+print(df_melted)
+
+#Slide 37
+
+#Moving rows to columns (pivot in PBI)
+
+df_pivoted = df.pivot(index='Name', columns='Gender', values='Salary')
+print(df_pivoted)
+
+#Slide 39
+
+#cocat datasets
+
+data1= {
+    'Name': ['Alice', 'Bob Newhart', '     Charlie', np.nan, '          Eve', 'Frank', 'Grace', 'Alice'],
+    'Age': [25, np.nan, 35, 40, 50, 'Unknown', 30, 25],
+    'Gender': ['Female', 'Male', np.nan, 'Female', 'Other', 'Male', 'Female', 'Female'],
+    'Salary': [50000, 52000, 55000, np.nan, 48000, 'N/A', 51000, 50000],
+    'Email': ['alice@email.com', 'bob@email', 'charlie--email.com', '', 'eve@email.com', '', 'grace@email.com', 'alice@email.com']
+}
+
+df1 = pd.DataFrame(data1)
+df1['DataGroup'] = 'Company_A'
+print(df1)
+
+data2= {
+    'Name': ['Graham', 'Simon', 'John', 'Fred', 'Francis'],
+    'Age': [85, 76, 25, 43, 62],
+    'Gender': ['Male', 'Male', np.nan, 'Male','Female'],
+    'Salary': [12000, 52000, 55000, 48000, 50000],
+    'Email': ['g_able@email.com', 'simon@here.com', 'jj@email.com', 'fred_clampett@email.com', 'frossi@quo.com']
+}
+
+df2 = pd.DataFrame(data2)
+df2['DataGroup'] = 'Company_B'
+print(df2)
+
+
+df_concat = pd.concat([df1,df2], ignore_index = True, sort=True)
+print(df_concat)
+
+
+#Slide 41
+
+#write to csv file--In the root folder
+
+df_stats.to_csv("stats.csv",sep=',')
+
+#Slide 43
+
+#Add a chart to the notebook using matlib -- df is the dataframe
+
+from matplotlib import pyplot as plt
+plt.bar(x=df['Age'], height=df['Salary'])
+
+#Slide 44
+
+ # Clear the plot area
+ plt.clf()
+
+ # Create a bar plot of revenue by year
+ plt.bar(x=df['Age'], height=df['Salary'], color='orange')
+
+ # Customize the chart
+ plt.title('Salary by year')
+ plt.xlabel('Year')
+ plt.ylabel('Salary')
+ plt.grid(color='#95a5a6', linestyle='--', linewidth=2, axis='y', alpha=0.7)
+ plt.xticks(rotation=45)
+
+ # Show the figure
+ plt.show()
+
+
+ # Clear the plot area
+ plt.clf()
+
+
+#---------------------???
+
+
+ # Create a figure (fig box) for 2 subplots (1 row, 2 columns)
+
+ fig, ax = plt.subplots(1, 2, figsize = (10,4))
+
+ # Create a bar plot of revenue by year on the first axis
+ ax[0].bar(x=df['Age'], height=df['Salary'], color='orange')
+ ax[0].set_title('Salary by Year')
+
+ # Create a pie chart of yearly order counts on the second axis
+ yearly_counts = df['Age'].value_counts()
+ ax[1].pie(yearly_counts)
+ ax[1].set_title('Rows by Age')
+ ax[1].legend(yearly_counts.keys().tolist())
+
+ # Add a title to the Figure
+ fig.suptitle('Dataframe Data')
+
+ # Show the figure
+ plt.show()
+
+
+
+#----------------------????
+
+
+
+
+#Slide 47
+
+import seaborn as sns
+
+# Clear the plot area
+plt.clf()
+# Create a bar chart
+ax = sns.barplot(x="Age", y="Salary", data=df)
+plt.show()
+
+
+# Clear the plot area
+plt.clf()
+
+# Set the visual theme for seaborn
+sns.set_theme(style="whitegrid")
+ # Create a bar chart
+ax = sns.barplot(x="Age", y="Salary", data=df)
+plt.show()
+
+# Clear the plot area
+plt.clf()
+
+# Create a bar chart
+ax = sns.lineplot(x="Age", y="Salary", data=df)
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
