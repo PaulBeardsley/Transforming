@@ -1,0 +1,5 @@
+Product Category,Manager Name
+Bikes,Nigel Owens
+Clothing,Sara Cox
+Accessories,Craig Joubert
+Components,George Clancy
