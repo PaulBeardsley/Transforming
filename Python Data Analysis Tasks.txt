@@ -1,0 +1,592 @@
+
+
+#Central Tendency
+
+#Slide 10
+
+import pandas as pd
+
+data = pd.Series([2, 5, 4, 5, 3])
+
+mean = data.mean()
+mode = data.mode().iloc[0]
+median = data.median()
+mid_range = (data.min() + data.max()) / 2
+
+print("Mean:", mean)
+print("Mode:", mode)
+print("Median:", median)
+print("Mid-Range:", mid_range)
+
+#Slide 15
+
+grouped_data = [(10, 5), (20, 8), (30, 12), (40, 7), (50, 3)]
+
+# Create a DataFrame from grouped data with a column for mid-points
+df = pd.DataFrame(grouped_data, columns=['Value', 'Frequency'])
+df['Midpoint'] = [15, 25, 35, 45, 55]
+
+# Create a Series with repeated midpoints based on frequencies
+data = pd.Series(df['Midpoint'].repeat(df['Frequency']))
+
+mean = data.mean()
+
+print("Class Midpoints:")
+print(df)
+print("Mean:", mean)
+
+#Slide 26
+
+data = [2, 3, 4, 6, 7, 7, 8, 19]
+df = pd.Series(data)
+
+data_range = df.max() - df.min()
+
+quartile_1 = df.quantile(0.25)
+quartile_3 = df.quantile(0.75)
+inter_quartile_range = quartile_3 - quartile_1
+
+
+variance = df.var(ddof=0)  # ddof=0 for population variance
+standard_deviation = df.std(ddof=0)    # ddof=0 for population standard deviation
+
+print("Data:", df.tolist())
+print("Range:", data_range)
+print(f"Interquartile Range (IQR): {quartile_3} - {quartile_1} =", inter_quartile_range)
+print("Population Variance:", variance)
+print("Population Standard Deviation:", standard_deviation)
+
+#Slide 27
+
+import numpy as np
+
+data = [2, 3, 4, 6, 7, 7, 8, 19]
+
+q1 = np.percentile(data, 25, method='midpoint')
+q3 = np.percentile(data, 75, method='midpoint')
+
+print("Q1:", q1)
+print("Q3:", q3)
+
+#Slide 30
+
+import numpy as np
+
+data = [2, 3, 4, 6, 7, 7, 8, 19]
+
+# Method 1: Mean plus or minus 2 standard deviations
+mean = np.mean(data)
+stddev = np.std(data)
+
+lower_bound_method1 = mean - 2 * stddev
+upper_bound_method1 = mean + 2 * stddev
+
+outliers_method1 = [x for x in data if x < lower_bound_method1 or x > upper_bound_method1]
+
+# Method 2: Q3 + 1.5 * IQR and Q1 - 1.5 * IQR
+q1 = np.percentile(data, 25)
+q3 = np.percentile(data, 75)
+iqr = q3 - q1
+
+lower_bound_method2 = q1 - 1.5 * iqr
+upper_bound_method2 = q3 + 1.5 * iqr
+
+outliers_method2 = [x for x in data if x < lower_bound_method2 or x > upper_bound_method2]
+
+print("Data:", data)
+print("Method 1 Outliers:", outliers_method1)
+print("Method 2 Outliers:", outliers_method2)
+
+
+
+# Slide 33
+
+
+import pandas as pd
+import numpy as np
+
+# Load data from the CSV file using pandas
+csv_filename = 'investment_performance.csv'
+df = pd.read_csv(csv_filename)
+
+# Calculate statistics for 'Control Scores'
+control_mean = df['Control Scores'].mean()
+control_mode = df['Control Scores'].mode().iloc[0]
+control_median = df['Control Scores'].median()
+control_mid_range = (df['Control Scores'].min() + df['Control Scores'].max()) / 2
+control_range = df['Control Scores'].max() - df['Control Scores'].min()
+control_iqr = np.percentile(df['Control Scores'], 75) - np.percentile(df['Control Scores'], 25)
+control_population_variance = df['Control Scores'].var(ddof=0)
+control_population_stddev = df['Control Scores'].std(ddof=0)
+
+# Calculate statistics for 'Experimental Scores'
+experimental_mean = df['Experimental Scores'].mean()
+experimental_mode = df['Experimental Scores'].mode().iloc[0]
+experimental_median = df['Experimental Scores'].median()
+experimental_mid_range = (df['Experimental Scores'].min() + df['Experimental Scores'].max()) / 2
+experimental_range = df['Experimental Scores'].max() - df['Experimental Scores'].min()
+experimental_iqr = np.percentile(df['Experimental Scores'], 75) - np.percentile(df['Experimental Scores'], 25)
+experimental_population_variance = df['Experimental Scores'].var(ddof=0)
+experimental_population_stddev = df['Experimental Scores'].std(ddof=0)
+
+# Display the results
+print("Control Scores:")
+print("Mean:", control_mean)
+print("Mode:", control_mode)
+print("Median:", control_median)
+print("Mid-Range:", control_mid_range)
+print("Range:", control_range)
+print("IQR:", control_iqr)
+print("Population Variance:", control_population_variance)
+print("Population Standard Deviation:", control_population_stddev)
+
+print("\nExperimental Scores:")
+print("Mean:", experimental_mean)
+print("Mode:", experimental_mode)
+print("Median:", experimental_median)
+print("Mid-Range:", experimental_mid_range)
+print("Range:", experimental_range)
+print("IQR:", experimental_iqr)
+print("Population Variance:", experimental_population_variance)
+print("Population Standard Deviation:", experimental_population_stddev)
+
+
+Visualisations and Skew
+
+# Slide 2
+
+#Run all of this together (Up to slide 3) to see the 3 Histograms
+
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Create a sample dataset
+data = np.random.randn(1000)  # Generating random data
+
+# Creating a Pandas DataFrame
+df = pd.DataFrame({'data': data})
+
+# Using Matplotlib directly
+plt.figure(figsize=(15, 6))
+
+plt.subplot(1, 3, 1)
+plt.hist(df['data'], bins=20, color='blue', alpha=0.7)
+plt.title('Histogram using Matplotlib')
+plt.xlabel('Value')
+plt.ylabel('Frequency')
+
+# Using Seaborn
+plt.subplot(1, 3, 2)
+sns.histplot(data=df, x='data', bins=20, color='green', alpha=0.7)
+plt.title('Histogram using Seaborn')
+plt.xlabel('Value')
+plt.ylabel('Frequency')
+
+# Using df.hist
+plt.subplot(1, 3, 3)
+df['data'].hist(bins=20, color='purple', alpha=0.7)
+plt.title('Histogram using Pandas')
+plt.xlabel('Value')
+plt.ylabel('Frequency')
+
+plt.tight_layout()
+plt.show()
+
+# Slide 3
+
+#Run All of this together (Up to Slide 8) to see 4 Scatter Plots
+
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Create a sample dataset
+np.random.seed(42)
+n_points = 100
+x = np.random.rand(n_points)
+y = 2 * x + np.random.normal(0, 0.2, n_points)
+
+# Creating a Pandas DataFrame
+df = pd.DataFrame({'X': x, 'Y': y})
+
+# Using Matplotlib directly
+plt.figure(figsize=(15, 5))
+
+plt.subplot(1, 3, 1)
+plt.scatter(df['X'], df['Y'], color='blue', alpha=0.7)
+plt.title('Scatter Plot using Matplotlib')
+plt.xlabel('X')
+plt.ylabel('Y')
+
+# Using Seaborn
+plt.subplot(1, 3, 2)
+sns.scatterplot(data=df, x='X', y='Y', color='green', alpha=0.7)
+plt.title('Scatter Plot using Seaborn')
+plt.xlabel('X')
+plt.ylabel('Y')
+
+# Using df.plot.scatter
+plt.subplot(1, 3, 3)
+df.plot.scatter(x='X', y='Y', color='purple', alpha=0.7)
+plt.title('Scatter Plot using Pandas')
+plt.xlabel('X')
+plt.ylabel('Y')
+
+plt.tight_layout()
+plt.show()
+
+
+
+#Slide 8
+
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Load data from the CSV file using pandas
+csv_filename = 'investment_performance.csv'
+df = pd.read_csv(csv_filename)
+
+# Create a single plot with overlaid histograms using seaborn
+plt.figure(figsize=(8, 6))
+sns.histplot(data=df, x='Control Scores', bins=10, color='blue', label='Control Scores', alpha=0.5)
+sns.histplot(data=df, x='Experimental Scores', bins=10, color='orange', label='Experimental Scores', alpha=0.5)
+plt.title('Histograms of Control and Experimental Scores')
+plt.xlabel('Scores')
+plt.ylabel('Frequency')
+plt.legend()
+plt.show()
+
+
+Intro to distrubutions
+
+#Slide 8
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import binom
+
+n = 10  # Number of trials
+p = 0.3  # Probability of success each time
+
+# Define the binomial distribution
+binomial_dist = binom(n, p)
+
+# Calculate probabilities for different values of X
+x_values = np.arange(0, n+1)  # Values of X: 0, 1, 2, ..., n
+probabilities = binomial_dist.pmf(x_values)
+
+# Create a bar plot to visualize the probability distribution
+plt.bar(x_values, probabilities)
+plt.xlabel('X (Number of Stops  out of 10 Lights)')
+plt.ylabel('Probability')
+plt.title('Binomial Distribution: Traffic Lights, p = 0.3')
+plt.show()
+
+Sampling
+
+-- Slide 10 Activity Random Numbers Python Solution
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+mean_to_generate = 5
+sd_to_generate = 10
+
+np.random.seed(1)
+population_data = np.random.normal(loc = mean_to_generate, scale = sd_to_generate, size=500)
+
+plt.hist(population_data, bins=20)  # Adjust the number of bins as needed
+plt.title('Population Data Histogram')
+plt.xlabel('Value')
+plt.ylabel('Frequency')
+plt.show()
+
+population_mean = np.mean(population_data)
+population_sd = np.std(population_data)
+
+print('Population mean:', population_mean)
+print('Population sd:', population_sd)
+
+-- Slide 11 Activity Sampling Python
+
+np.random.seed(1)
+sampleSize = 50
+sample = np.random.choice(population_data, size = sampleSize)
+
+plt.hist(sample, bins=20)
+plt.title('Sample Histogram')
+plt.xlabel('Value')
+plt.ylabel('Frequency')
+plt.show()
+
+sample_mean = np.mean(sample)
+sample_sd1 = np.std(sample)
+sample_sd2 = np.std(sample, ddof = 1)
+
+
+print('Sample mean:',sample_mean, '. Compared to the population:', population_mean)
+print('Sample sd default:',sample_sd1, '. Compared to the population:', population_sd)
+print('Sample sd ddof=1:',sample_sd1, '. Compared to the population:', population_sd)
+
+
+
+-- Slide 12 Python Solution Extension Repeat Sampling
+
+np.random.seed(1)
+
+number_of_samples = 100000
+sample_size = 50
+
+sample_means = []
+sample_sd_p = []
+sample_sd_s = []
+
+for count in range(number_of_samples):
+    sample = np.random.choice(population_data, size = sample_size)
+    sample_means.append(np.mean(sample))
+    sample_sd_p.append(np.std(sample))
+    sample_sd_s.append(np.std(sample, ddof = 1)) #setting ddof = 1 means the n-1 formula will be used.
+    
+print("The sample means average out as", np.mean(sample_means), 'compared to the population:', population_mean)
+print("The samples standard deviations (n formula) average out as", 
+      np.mean(sample_sd_p),
+      'and for the n-1 formula:',
+      np.mean(sample_sd_s), 'compared to the population:', population_sd)
+
+
+
+Introduction to Hypothesis Testing
+
+
+
+--Slide 10 T-test Solution
+
+import pandas as pd
+from scipy import stats
+
+csv_filename = 'investment_performance.csv'
+df = pd.read_csv(csv_filename)
+stats.ttest_ind(df['Control Scores'], df['Experimental Scores'])
+
+
+Examples of Linear Regression
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+
+# Generate random data
+np.random.seed(0)
+x = np.random.rand(50) * 10
+y = 2 * x + 1 + np.random.randn(50) * 2
+
+# Reshape the data for scikit-learn
+x = x.reshape(-1, 1)
+y = y.reshape(-1, 1)
+
+# Create a linear regression model
+model = LinearRegression()
+model.fit(x, y)
+
+# Generate predicted values
+x_pred = np.linspace(0, 10, 100).reshape(-1, 1)
+y_pred = model.predict(x_pred)
+
+# Calculate standard deviation of residuals
+residuals = y - model.predict(x)
+std_dev = np.std(residuals)
+
+# Create a scatter plot
+plt.figure(figsize=(10, 6))
+plt.scatter(x, y, label="Data points", color="blue")
+plt.plot(x_pred, y_pred, color="red", label="Linear Regression")
+plt.fill_between(
+    x_pred.flatten(),
+    y_pred.flatten() - 2 * std_dev,
+    y_pred.flatten() + 2 * std_dev,
+    color="gray",
+    alpha=0.3,
+    label="Error Window",
+)
+plt.xlabel("X")
+plt.ylabel("Y")
+plt.title("Scatter Plot with Linear Regression and Error Window")
+
+# Annotate the plot with the equation of the line
+equation = f"y = {model.coef_[0][0]:.2f}x + {model.intercept_[0]:.2f}"
+plt.text(2, 18, equation, fontsize=12, color="green")
+
+plt.legend()
+plt.grid(True)
+plt.show()
+
+#(R-Squared)
+
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
+
+# Generate random data
+np.random.seed(0)
+x = np.random.rand(50) * 10
+y = 2* x + 1 + np.random.randn(50) * 2
+
+# Reshape the data for scikit-learn
+x = x.reshape(-1, 1)
+y = y.reshape(-1, 1)
+
+# Create a linear regression model
+model = LinearRegression()
+model.fit(x, y)
+
+# Generate predicted values
+x_pred = np.linspace(0, 10, 100).reshape(-1, 1)
+y_pred = model.predict(x_pred)
+
+# Calculate R squared
+r_squared = r2_score(y, model.predict(x))
+
+# Calculate standard deviation of residuals
+residuals = y - model.predict(x)
+std_dev = np.std(residuals)
+
+# Create a scatter plot
+plt.figure(figsize=(10, 6))
+plt.scatter(x, y, label="Data points", color="blue")
+plt.plot(x_pred, y_pred, color="red", label="Linear Regression")
+plt.fill_between(
+    x_pred.flatten(),
+    y_pred.flatten() - 2 * std_dev,
+    y_pred.flatten() + 2 * std_dev,
+    color="gray",
+    alpha=0.3,
+    label="Error Window",
+)
+#plt.xlabel("X")
+#plt.ylabel("Y")
+#plt.title("Scatter Plot with Linear Regression and Error Window")
+
+# Annotate the plot with the equation of the line
+#equation = f"y = {model.coef_[0][0]:.2f}x + {model.intercept_[0]:.2f}"
+#plt.text(2, 18, equation, fontsize=12, color="green")
+r_squared_text = f"R Squared = {r_squared:.2f}"
+#plt.text(1, 16, r_squared_text, fontsize=12, color="purple")
+
+plt.legend()
+plt.grid(True)
+plt.show()
+
+print(r_squared_text)
+
+#(Pearson Correlation) - P Value
+
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+from scipy.stats import pearsonr
+
+# Generate random data
+np.random.seed(0)
+x = np.random.rand(50) * 10
+y = 2 * x + 1 + np.random.randn(50) * 2
+
+# Calculate Pearson correlation coefficient and p-value
+corr_coeff, p_value = pearsonr(x, y)
+
+# Reshape the data for scikit-learn
+x = x.reshape(-1, 1)
+y = y.reshape(-1, 1)
+
+# Create a linear regression model
+model = LinearRegression()
+model.fit(x, y)
+
+# Generate predicted values
+x_pred = np.linspace(0, 15, 100).reshape(-1, 1)  # Extend the range
+y_pred = model.predict(x_pred)
+
+# Add predicted points for larger x coordinates
+new_x = np.array([[10], [14.5],[-5]])  # Example new x coordinates
+new_y_pred = model.predict(new_x)
+
+
+# Create a scatter plot
+plt.figure(figsize=(10, 6))
+plt.scatter(x, y, label="Original Data points", color="blue")
+plt.plot(new_x, new_y_pred, color="purple")
+
+# Add vertical lines at the smallest and largest x coordinates
+min_x = np.min(x)
+max_x = np.max(x)
+plt.axvline(x=min_x, color="green", linestyle="--", label="Smallest and Largest X values in the original data")
+plt.axvline(x=max_x, color="green", linestyle="--")
+
+
+plt.scatter(new_x, new_y_pred, color="magenta", label="New values predicted - Extrapolation")
+
+plt.xlabel("X")
+plt.ylabel("Y")
+
+plt.legend()
+plt.grid(True)
+plt.show()
+
+#Linear regression from CSV
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+# Load data from the CSV file using pandas
+csv_filename = 'Investment.csv'
+df = pd.read_csv(csv_filename)
+x = df['Amount']
+y = df['Return']
+linreg = LinearRegression()
+x = df.Amount.values
+y = df.Return.values
+x = x.reshape(-1,1)
+#Fit in a regression Line
+linreg.fit(x,y)
+y_pred = linreg.predict(x)
+#plot the scatter plot
+plt.scatter(x,y)
+#draw the line of regression
+plt.plot(x, y_pred, color = 'red')
+#show the plot
+plt.show()
+
+
+#show the gradient
+print (linreg.coef_) 
+#show where the line cuts the y-axis
+print (linreg.intercept_)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
